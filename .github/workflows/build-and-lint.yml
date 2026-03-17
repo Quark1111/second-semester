@@ -7,14 +7,31 @@ on:
     branches: [ main, master ]
 
 jobs:
-  check:
+  build-and-lint:
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Установка clang-format
-      run: sudo apt-get update && sudo apt-get install -y clang-format-18
-    
-    - name: Проверка формата
-      run: find . -path ./build -prune -o -type f -name '*.[c|h]' -print | xargs clang-format-18 --style=file --dry-run -Werror
+      - uses: actions/checkout@v4
+      
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format-18 clang-tidy-18
+          sudo ln -sf /usr/bin/clang-format-18 /usr/bin/clang-format
+          sudo ln -sf /usr/bin/clang-tidy-18 /usr/bin/clang-tidy
+          sudo ln -sf /usr/bin/run-clang-tidy-18 /usr/bin/run-clang-tidy
+      
+      - name: Check format
+        run: |
+          find . -path ./build -prune -o -type f -name '*.[c|h]' -print | xargs clang-format --style=file --dry-run -Werror
+      
+      - name: Configure
+        run: |
+          cmake . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      
+      - name: Build
+        run: |
+          cmake --build build
+      
+      - name: Lint
+        run: |
+          run-clang-tidy -p=build
