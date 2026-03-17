@@ -30,25 +30,25 @@ void DeleteTable(Table* table)
     if (table == NULL) {
         return;
     }
-    
+
     for (int i = 0; i < table->row; i++) {
         if (table->data[i] != NULL) {
             free(table->data[i]);
         }
     }
     free(table->data);
-    
+
     for (int i = 0; i < table->cols * table->row; i++) {
         if (table->Tabl[i].str != NULL) {
             free(table->Tabl[i].str);
         }
     }
     free(table->Tabl);
-    
+
     if (table->maxlenCols != NULL) {
         free(table->maxlenCols);
     }
-    
+
     free(table);
 }
 
@@ -69,23 +69,23 @@ void DrawTable(Table* table, char* outputfile)
         printf("Error: Table is NULL\n");
         return;
     }
-    
+
     if (table->Tabl == NULL) {
         printf("Error: Table cells are not initialized\n");
         return;
     }
-    
+
     if (table->maxlenCols == NULL) {
         printf("Error: Column widths are not initialized\n");
         return;
     }
-    
+
     FILE* file = fopen(outputfile, "w");
     if (file == NULL) {
         printf("Error: Cannot create file %s\n", outputfile);
         return;
     }
-    
+
     if (table->row == 0) {
         drawLine(file, '=', table->maxlenCols, table->cols);
         fprintf(file, "|");
@@ -101,10 +101,10 @@ void DrawTable(Table* table, char* outputfile)
         fclose(file);
         return;
     }
-    
+
     drawLine(file, '=', table->maxlenCols, table->cols);
     fprintf(file, "|");
-    
+
     for (int j = 0; j < table->cols; j++) {
         int cell_index = 0 * table->cols + j;
         cage current = table->Tabl[cell_index];
@@ -121,17 +121,17 @@ void DrawTable(Table* table, char* outputfile)
         }
         fprintf(file, " |");
     }
-    
+
     fprintf(file, "\n");
     drawLine(file, '=', table->maxlenCols, table->cols);
-    
+
     for (int i = 1; i < table->row; i++) {
         fprintf(file, "|");
         for (int j = 0; j < table->cols; j++) {
             int cell_index = i * table->cols + j;
             cage current = table->Tabl[cell_index];
             fprintf(file, " ");
-    
+
             if (current.str != NULL) {
                 if (current.number) {
                     for (int k = current.len; k < table->maxlenCols[j]; k++) {
@@ -149,14 +149,14 @@ void DrawTable(Table* table, char* outputfile)
                     fprintf(file, " ");
                 }
             }
-            
+
             fprintf(file, " |");
         }
-        
+
         fprintf(file, "\n");
         drawLine(file, '-', table->maxlenCols, table->cols);
     }
-    
+
     fclose(file);
     printf("Table successfully saved to %s\n", outputfile);
 }
@@ -168,13 +168,13 @@ static Table* readCSV(char* inputfile)
         printf("File not found: %s\n", inputfile);
         return NULL;
     }
-    
+
     Table* table = calloc(1, sizeof(Table));
     if (table == NULL) {
         fclose(file);
         return NULL;
     }
-    
+
     int len = 0, capacity = 10, cols = 0;
     char** str = malloc(capacity * sizeof(char*));
     if (str == NULL) {
@@ -182,10 +182,10 @@ static Table* readCSV(char* inputfile)
         fclose(file);
         return NULL;
     }
-    
+
     char* buffer = NULL;
     size_t ln = 0;
-    
+
     while (getline(&buffer, &ln, file) != -1) {
         if (len >= capacity) {
             capacity *= 2;
@@ -203,80 +203,80 @@ static Table* readCSV(char* inputfile)
             }
             str = newstr;
         }
-        
+
         str[len] = buffer;
         len++;
-        
+
         int newcols = cntcols(buffer);
         if (newcols > cols) {
             cols = newcols;
         }
-        
+
         buffer = NULL;
     }
-    
+
     free(buffer);
     fclose(file);
-    
+
     table->data = str;
     table->cols = cols;
     table->row = len;
-    
+
     return table;
 }
 
 Table* Createtable(char* inputfile)
 {
-    Table *table = readCSV(inputfile);
+    Table* table = readCSV(inputfile);
     if (table == NULL) {
         return NULL;
     }
-    
+
     table->maxlenCols = calloc(table->cols, sizeof(int));
     if (table->maxlenCols == NULL) {
         printf("Error: Failed to allocate column widths\n");
         DeleteTable(table);
         return NULL;
     }
-    
+
     table->Tabl = calloc(table->row * table->cols, sizeof(cage));
     if (table->Tabl == NULL) {
         printf("Error: Failed to allocate table cells\n");
         DeleteTable(table);
         return NULL;
     }
-    
+
     for (int i = 0; i < table->row; i++) {
         int start = 0, col = 0;
         char* row = table->data[i];
         int row_len = strlen(row);
-        
+
         for (int j = 0; j <= row_len - 1; j++) {
             if (j == row_len || row[j] == ',' || row[j] == '\n') {
                 int lenCol = j - start;
                 int cell_index = i * table->cols + col;
-                
+
                 table->Tabl[cell_index].str = calloc(lenCol + 1, sizeof(char));
                 if (table->Tabl[cell_index].str == NULL) {
                     printf("Error: Failed to allocate cell string\n");
                     DeleteTable(table);
                     return NULL;
                 }
-                
+
                 strncpy(table->Tabl[cell_index].str, row + start, lenCol);
                 table->Tabl[cell_index].str[lenCol] = '\0';
                 table->Tabl[cell_index].len = lenCol;
                 table->Tabl[cell_index].number = isNumber(table->Tabl[cell_index].str);
-                
+
                 if (table->maxlenCols[col] < lenCol) {
                     table->maxlenCols[col] = lenCol;
                 }
-                
+
                 col++;
                 start = j + 1;
             }
         }
-        
+
         for (int j = col; j < table->cols; j++) {
             int cell_index = i * table->cols + j;
             table->Tabl[cell_index].str = NULL;
@@ -284,8 +284,6 @@ Table* Createtable(char* inputfile)
             table->Tabl[cell_index].number = false;
         }
     }
-    
+
     return table;
 }
-
-
