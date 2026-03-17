@@ -30,6 +30,5 @@ int main(int argc, char* argv[])
         printf("   or: %s (interactive mode)\n", argv[0]);
         return 1;
     }
-    
     return 0;
 }
