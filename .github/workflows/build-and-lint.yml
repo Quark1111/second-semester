@@ -43,5 +43,5 @@ jobs:
       
       - name: Run test script
         run: |
-          chmod +x Tests/run_tests.sh
-          ./Tests/run_tests.sh
+          chmod +x run_tests.sh
+          ./run_tests.sh
