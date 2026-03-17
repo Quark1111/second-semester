@@ -2,20 +2,20 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-typedef struct cage {
+typedef struct Cage {
     char* str;
     int len;
     bool number;
-} cage;
+} Cage;
 
 typedef struct {
     int row;
     int cols;
     int* maxlenCols;
     char** data;
-    cage* Tabl;
+    Cage* tabl;
 } Table;
 
-Table* Createtable(char* inputfile);
-void DeleteTable(Table* table);
-void DrawTable(Table* table, char* outputfile);
+Table* createTable(char* inputfile);
+void deleteTable(Table* table);
+void drawTable(Table* table, char* outputfile);
