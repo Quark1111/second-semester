@@ -4,7 +4,7 @@
 
 typedef struct cage {
     char* str;
-    int  len;
+    int len;
     bool number;
 } cage;
 
