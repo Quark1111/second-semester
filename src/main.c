@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     if (argc == 1) {
         char input[256], output[256];
         printf("Enter input file: ");
-        scanf("s", input);
+        scanf("%s", input);
         printf("Enter output file: ");
         scanf("%s", output);
         Table* table = createTable(input);
