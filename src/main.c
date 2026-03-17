@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
         printf("Enter input file: ");
         scanf("s", input);
         printf("Enter output file: ");
-        scanf("%255s", output);
+        scanf("%s", output);
         Table* table = createTable(input);
         if (table != NULL) {
             drawTable(table, output);
