@@ -1,0 +1,6 @@
+Checks: 'clang-*,cppcoreguidelines-*,performance-*,portability-*,readability-*,-readability-identifier-naming'
+CheckOptions:
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack
+  - key: readability-identifier-naming.VariableCase
+    value: camelBack
