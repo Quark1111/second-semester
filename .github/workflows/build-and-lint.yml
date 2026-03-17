@@ -35,3 +35,13 @@ jobs:
       - name: Lint
         run: |
           run-clang-tidy -p=build
+          
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure
+      
+      - name: Run test script
+        run: |
+          chmod +x Tests/run_tests.sh
+          ./Tests/run_tests.sh
