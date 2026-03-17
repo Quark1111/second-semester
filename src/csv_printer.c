@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int cntcols(char* buffer)
+static int countColumns(char* buffer)
 {
     int cnt = 0;
     for (int i = 0; i < strlen(buffer); i++) {
@@ -25,7 +25,7 @@ static bool isNumber(char* str)
     return (endptr != str && *endptr == '\0');
 }
 
-void DeleteTable(Table* table)
+void deleteTable(Table* table)
 {
     if (table == NULL) {
         return;
@@ -38,12 +38,14 @@ void DeleteTable(Table* table)
     }
     free(table->data);
 
-    for (int i = 0; i < table->cols * table->row; i++) {
-        if (table->Tabl[i].str != NULL) {
-            free(table->Tabl[i].str);
+    if (table->tabl != NULL) {
+        for (int i = 0; i < table->cols * table->row; i++) {
+            if (table->tabl[i].str != NULL) {
+                free(table->tabl[i].str);
+            }
         }
+        free(table->tabl);
     }
-    free(table->Tabl);
 
     if (table->maxlenCols != NULL) {
         free(table->maxlenCols);
@@ -52,7 +54,7 @@ void DeleteTable(Table* table)
     free(table);
 }
 
-static void drawLine(FILE* file, char symb, int* maxCols, int len)
+static void drawLine(FILE* file, char symb, const int* maxCols, int len)
 {
     for (int i = 0; i < len; i++) {
         fprintf(file, "+");
@@ -63,14 +65,14 @@ static void drawLine(FILE* file, char symb, int* maxCols, int len)
     fprintf(file, "+\n");
 }
 
-void DrawTable(Table* table, char* outputfile)
+void drawTable(Table* table, char* outputfile)
 {
     if (table == NULL) {
         printf("Error: Table is NULL\n");
         return;
     }
 
-    if (table->Tabl == NULL) {
+    if (table->tabl == NULL) {
         printf("Error: Table cells are not initialized\n");
         return;
     }
@@ -106,8 +108,8 @@ void DrawTable(Table* table, char* outputfile)
     fprintf(file, "|");
 
     for (int j = 0; j < table->cols; j++) {
-        int cell_index = 0 * table->cols + j;
-        cage current = table->Tabl[cell_index];
+        int cellIndex = 0 * table->cols + j;
+        Cage current = table->tabl[cellIndex];
         fprintf(file, " ");
         if (current.str != NULL) {
             fprintf(file, "%s", current.str);
@@ -128,8 +130,8 @@ void DrawTable(Table* table, char* outputfile)
     for (int i = 1; i < table->row; i++) {
         fprintf(file, "|");
         for (int j = 0; j < table->cols; j++) {
-            int cell_index = i * table->cols + j;
-            cage current = table->Tabl[cell_index];
+            int cellIndex = i * table->cols + j;
+            Cage current = table->tabl[cellIndex];
             fprintf(file, " ");
 
             if (current.str != NULL) {
@@ -207,7 +209,7 @@ static Table* readCSV(char* inputfile)
         str[len] = buffer;
         len++;
 
-        int newcols = cntcols(buffer);
+        int newcols = countColumns(buffer);
         if (newcols > cols) {
             cols = newcols;
         }
@@ -225,64 +227,72 @@ static Table* readCSV(char* inputfile)
     return table;
 }
 
-Table* Createtable(char* inputfile)
+Table* createTable(char* inputfile)
 {
     Table* table = readCSV(inputfile);
     if (table == NULL) {
         return NULL;
     }
 
-    table->maxlenCols = calloc(table->cols, sizeof(int));
-    if (table->maxlenCols == NULL) {
-        printf("Error: Failed to allocate column widths\n");
-        DeleteTable(table);
-        return NULL;
+    if (table->cols > 0) {
+        table->maxlenCols = calloc(table->cols, sizeof(int));
+        if (table->maxlenCols == NULL) {
+            printf("Error: Failed to allocate column widths\n");
+            deleteTable(table);
+            return NULL;
+        }
+    } else {
+        table->maxlenCols = NULL;
     }
 
-    table->Tabl = calloc(table->row * table->cols, sizeof(cage));
-    if (table->Tabl == NULL) {
-        printf("Error: Failed to allocate table cells\n");
-        DeleteTable(table);
-        return NULL;
-    }
+    if (table->row > 0 && table->cols > 0) {
+        table->tabl = calloc(table->row * table->cols, sizeof(Cage));
+        if (table->tabl == NULL) {
+            printf("Error: Failed to allocate table cells\n");
+            deleteTable(table);
+            return NULL;
+        }
 
-    for (int i = 0; i < table->row; i++) {
-        int start = 0, col = 0;
-        char* row = table->data[i];
-        int row_len = strlen(row);
+        for (int i = 0; i < table->row; i++) {
+            int start = 0, col = 0;
+            char* row = table->data[i];
+            size_t rowLen = strlen(row);
 
-        for (int j = 0; j <= row_len - 1; j++) {
-            if (j == row_len || row[j] == ',' || row[j] == '\n') {
-                int lenCol = j - start;
-                int cell_index = i * table->cols + col;
+            for (size_t j = 0; j <= rowLen - 1; j++) {
+                if (j == rowLen || row[j] == ',' || row[j] == '\n') {
+                    int lenCol = (int)(j - start);
+                    int cellIndex = i * table->cols + col;
 
-                table->Tabl[cell_index].str = calloc(lenCol + 1, sizeof(char));
-                if (table->Tabl[cell_index].str == NULL) {
-                    printf("Error: Failed to allocate cell string\n");
-                    DeleteTable(table);
-                    return NULL;
+                    table->tabl[cellIndex].str = calloc(lenCol + 1, sizeof(char));
+                    if (table->tabl[cellIndex].str == NULL) {
+                        printf("Error: Failed to allocate cell string\n");
+                        deleteTable(table);
+                        return NULL;
+                    }
+
+                    strncpy(table->tabl[cellIndex].str, row + start, lenCol);
+                    table->tabl[cellIndex].str[lenCol] = '\0';
+                    table->tabl[cellIndex].len = lenCol;
+                    table->tabl[cellIndex].number = isNumber(table->tabl[cellIndex].str);
+
+                    if (table->maxlenCols[col] < lenCol) {
+                        table->maxlenCols[col] = lenCol;
+                    }
+
+                    col++;
+                    start = (int)j + 1;
                 }
+            }
 
-                strncpy(table->Tabl[cell_index].str, row + start, lenCol);
-                table->Tabl[cell_index].str[lenCol] = '\0';
-                table->Tabl[cell_index].len = lenCol;
-                table->Tabl[cell_index].number = isNumber(table->Tabl[cell_index].str);
-
-                if (table->maxlenCols[col] < lenCol) {
-                    table->maxlenCols[col] = lenCol;
-                }
-
-                col++;
-                start = j + 1;
+            for (int j = col; j < table->cols; j++) {
+                int cellIndex = i * table->cols + j;
+                table->tabl[cellIndex].str = NULL;
+                table->tabl[cellIndex].len = 0;
+                table->tabl[cellIndex].number = false;
             }
         }
-
-        for (int j = col; j < table->cols; j++) {
-            int cell_index = i * table->cols + j;
-            table->Tabl[cell_index].str = NULL;
-            table->Tabl[cell_index].len = 0;
-            table->Tabl[cell_index].number = false;
-        }
+    } else {
+        table->tabl = NULL;
     }
 
     return table;
