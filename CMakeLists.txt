@@ -1,4 +1,4 @@
 cmake_minimum_required(VERSION 3.10)
-project(csv_printer C)
-add_executable(csv_printer src/csv_printer.c src/main.c)
-target_include_directories(csv_printer PRIVATE src)
+project(avl_tree C)
+add_executable(avl_tree src/avl_tree.c src/main.c)
+target_include_directories(avl_tree PRIVATE src)

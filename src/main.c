@@ -1,35 +1,113 @@
-#include "csv_printer.h"
+#include "avl_tree.h"
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+void readFile(AvlTree* tree, char* inputfile)
+{
+    FILE* file = fopen(inputfile, "r");
+    if (file == NULL) {
+        printf("file not found\n");
+        return;
+    }
+    char* buffer = NULL;
+    size_t len = 0;
+    int read;
+    
+    while ((read = getline(&buffer, &len, file)) != -1) {
+        if (read > 0 && buffer[read - 1] == '\n') {
+            buffer[read - 1] = '\0';
+        }
+        insert(tree, buffer);
+    }
+    free(buffer);
+    fclose(file);
+}
+
+void interface(AvlTree* tree, int argc, char* outputfile)
+{
+    char* buffer = NULL;
+    size_t len = 0;
+    int read;
+    
+    while (1) {
+        printf("> ");
+        read = getline(&buffer, &len, stdin);
+        if (read == -1) {
+            quit(tree);
+            free(buffer);
+            break;
+        }
+        
+        if (read > 0 && buffer[read - 1] == '\n') {
+            buffer[read - 1] = '\0';
+        }
+        
+        if (strncmp(buffer, "find ", 5) == 0) {
+            char* code = buffer + 5;
+            char* result = find(tree->root, code);
+            if (result) {
+                printf("%s -> %s\n", code, result);
+            } else {
+                printf("Аэропорт с кодом '%s' не найден в базе.\n", code);
+            }
+        }
+        else if (strncmp(buffer, "add ", 4) == 0) {
+            char* str = buffer + 4;
+            insert(tree, str);
+            printf("Аэропорт добавлен в базу.\n");
+        }
+        else if (strncmp(buffer, "delete ", 7) == 0) {
+            char* code = buffer + 7;
+            int old_size = tree->size;
+            delete(tree, code);
+            if (tree->size < old_size) {
+                printf("Аэропорт '%s' удалён из базы.\n", code);
+            } else {
+                printf("Аэропорт с кодом '%s' не найден.\n", code);
+            }
+        }
+        else if (strcmp(buffer, "save") == 0) {
+            if (argc == 1) {
+                char namefile[100];
+                printf("Введите имя файла: ");
+                if (scanf("%99s", namefile) == 1) {
+                    save(tree, namefile);
+                    printf("База сохранена.\n");
+                }
+                int c;
+                while ((c = getchar()) != '\n' && c != EOF);
+            } else {
+                save(tree, outputfile);
+                printf("База сохранена: %d аэропортов.\n", tree->size);
+            }
+        }
+        else if (strcmp(buffer, "quit") == 0) {
+            quit(tree);
+            free(buffer);
+            return;
+        }
+        else if (strlen(buffer) > 0) {
+            printf("Неизвестная команда\n");
+        }
+        
+        free(buffer);
+        buffer = NULL;
+    }
+}
 
 int main(int argc, char* argv[])
 {
-    if (argc == 3) {
-        Table* table = Createtable(argv[1]);
-        if (table) {
-            DrawTable(table, argv[2]);
-            DeleteTable(table);
-        }
-    } else if (argc == 1) {
-        char inputfile[256], outputfile[256];
-        printf("Enter input file: ");
-        if (scanf("%255s", inputfile) != 1) {
-            return 1;
-        }
-        printf("Enter output file: ");
-        if (scanf("%255s", outputfile) != 1) {
-            return 1;
-        }
-        Table* table = Createtable(inputfile);
-        if (table) {
-            DrawTable(table, outputfile);
-            DeleteTable(table);
-        }
-    } else {
-        printf("Usage: %s [input.csv output.txt]\n", argv[0]);
-        printf("   or: %s (interactive mode)\n", argv[0]);
-        return 1;
-    }
+    AvlTree* tree = createTree();
     
+    if (argc == 2) {
+        readFile(tree, argv[1]);
+        printf("Загружено %d аэропортов. Система готова к работе.\n", tree->size);
+        interface(tree, argc, argv[1]);
+    } else if (argc == 1) {
+        printf("Система готова к работе. База пуста.\n");
+        interface(tree, argc, NULL);
+    }
     return 0;
 }
