@@ -244,8 +244,8 @@ static Node* deleteNode(Node* node, char* key, bool* unique)
         return balanceNode(node);
     }
     return node;
-
 }
+
 void delete(AvlTree* tree, char* key)
 {
     if (tree == NULL || tree->root == NULL) {
@@ -257,6 +257,7 @@ void delete(AvlTree* tree, char* key)
         tree->size--;
     }
 }
+
 static Node* deleteAllNode(Node* node)
 {
     if (node == NULL) {
