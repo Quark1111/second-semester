@@ -44,4 +44,4 @@ jobs:
       - name: Run test script
         run: |
           chmod +x run_tests.sh
-          ./run_tests.sh или может мне это как то поменять чтоб оно запускало сланг тайди формат из мэйна в мой пулл риквест
+          ./run_tests.sh
