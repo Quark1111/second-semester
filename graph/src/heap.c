@@ -25,10 +25,10 @@ static void siftDown(Heap* heap, unsigned int index)
     if (heap == NULL || heap->arrayNode == NULL) {
         return;
     }
-    while (index*2 + 1 < heap->len) {
-        unsigned int indexChild = index*2 + 1;
+    while (index * 2 + 1 < heap->len) {
+        unsigned int indexChild = index * 2 + 1;
         if (indexChild + 1 < heap->len && heap->arrayNode[indexChild].dist > heap->arrayNode[indexChild + 1].dist) {
-            indexChild += 1;    
+            indexChild += 1;
         }
         if (heap->arrayNode[indexChild].dist < heap->arrayNode[index].dist) {
             Node temp = heap->arrayNode[indexChild];
@@ -77,6 +77,7 @@ void insertHeap(Heap* heap, unsigned int city, int dist)
     heap->len++;
     siftUp(heap, heap->len - 1);
 }
+
 void extractMinHeap(Heap* heap)
 {
     if (heap == NULL || heap->arrayNode == NULL || heap->len == 0) {
@@ -97,7 +98,10 @@ Node* getMin(Heap* heap)
 
 void deleteHeap(Heap* heap)
 {
-    if (heap == NULL || heap->arrayNode == NULL) {
+    if (heap == NULL) {
+        return;
+    }
+    if (heap->arrayNode == NULL) {
         free(heap);
         return;
     }

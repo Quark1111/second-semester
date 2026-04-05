@@ -34,30 +34,31 @@ void connectVertex(Graph* graph, unsigned int vertex1, unsigned int vertex2, int
     if (graph == NULL || graph->vertex == NULL) {
         return;
     }
-    if (graph->size < vertex1 || graph->size < vertex2) {
+    if (vertex1 < 1 || vertex1 > graph->size || vertex2 < 1 || vertex2 > graph->size) {
         return;
-    }    
+    }
     if (graph->vertex[vertex1 - 1] == NULL || graph->vertex[vertex2 - 1] == NULL) {
         return;
     }
-    
+
     unsigned int* addedVertex1 = &(graph->vertex[vertex1 - 1]->added);
     unsigned int* addedVertex2 = &(graph->vertex[vertex2 - 1]->added);
 
     graph->vertex[vertex1 - 1]->neighbors[*addedVertex1] = vertex2;
     graph->vertex[vertex1 - 1]->weightNeighbors[*addedVertex1] = weight;
     (*addedVertex1)++;
-    
+
     graph->vertex[vertex2 - 1]->neighbors[*addedVertex2] = vertex1;
     graph->vertex[vertex2 - 1]->weightNeighbors[*addedVertex2] = weight;
     (*addedVertex2)++;
-    
-    
 }
 
 void deleteGraph(Graph* graph)
 {
-    if (graph == NULL || graph->vertex == NULL) {
+    if (graph == NULL) {
+        return;
+    }
+    if (graph->vertex == NULL) {
         free(graph);
         return;
     }

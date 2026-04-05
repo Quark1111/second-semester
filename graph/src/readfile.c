@@ -11,11 +11,11 @@ static bool correctInputCities(unsigned int city, unsigned int size)
 Graph* readfile(unsigned int** capitals, unsigned int* len, char* inputfile)
 {
     FILE* file = fopen(inputfile, "r");
-    
+
     if (file == NULL) {
         return NULL;
     }
-    
+
     unsigned int n, m;
     if (fscanf(file, "%u %u", &n, &m) != 2) {
         printf("incorrect input data format");
@@ -25,16 +25,16 @@ Graph* readfile(unsigned int** capitals, unsigned int* len, char* inputfile)
 
     unsigned int* cntVertex = calloc(n, sizeof(unsigned int));
     if (cntVertex == NULL) {
-        fclose(file);  
+        fclose(file);
         return NULL;
     }
-    
+
     for (unsigned int i = 0; i < m; i++) {
         unsigned city1, city2;
         int len;
-        if(fscanf(file, "%u %u %d", &city1, &city2, &len) != 3 
-           || correctInputCities(city1, n) == 0 
-           || correctInputCities(city2, n) == 0) {
+        if (fscanf(file, "%u %u %d", &city1, &city2, &len) != 3
+            || correctInputCities(city1, n) == 0
+            || correctInputCities(city2, n) == 0) {
             printf("incorrect input data format");
             free(cntVertex);
             fclose(file);
@@ -43,7 +43,7 @@ Graph* readfile(unsigned int** capitals, unsigned int* len, char* inputfile)
         cntVertex[city1 - 1]++;
         cntVertex[city2 - 1]++;
     }
-    
+
     rewind(file);
     fscanf(file, "%u %u", &n, &m);
     Graph* graph = createGraph(n);
@@ -52,7 +52,7 @@ Graph* readfile(unsigned int** capitals, unsigned int* len, char* inputfile)
         fclose(file);
         return NULL;
     }
-    
+
     for (unsigned int i = 0; i < n; i++) {
         graph->vertex[i] = createVertex(cntVertex[i], i);
         if (graph->vertex[i] == NULL) {
@@ -101,7 +101,7 @@ Graph* readfile(unsigned int** capitals, unsigned int* len, char* inputfile)
     }
     free(cntVertex);
     fclose(file);
-    
+
     *capitals = caps;
     *len = cntStates;
     return graph;

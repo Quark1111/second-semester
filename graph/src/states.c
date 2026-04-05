@@ -1,9 +1,9 @@
 #include "graph.h"
 #include "heap.h"
 #include "readfile.h"
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 
 void deleteAllHeap(Heap** heaps, unsigned int size)
 {
@@ -18,14 +18,6 @@ void deleteAllHeap(Heap** heaps, unsigned int size)
     free(heaps);
 }
 
-int minDistance(int weight1, int weight2)
-{
-    if (weight1 > weight2) {
-        return weight2;
-    }
-    return weight1;
-}
-
 int solve(Graph* graph, unsigned int* capitals, unsigned int len, char* outputfile)
 {
     unsigned int n = graph->size;
@@ -38,9 +30,7 @@ int solve(Graph* graph, unsigned int* capitals, unsigned int len, char* outputfi
     for (unsigned int i = 0; i < n; i++) {
         visited[i] = 0;
     }
-    for (unsigned int i = 0; i < len; i++) {
-        unsigned int capital = capitals[i];
-    }
+
     Heap** allHeap = calloc(len, sizeof(Heap*));
     if (allHeap == NULL) {
         free(visited);
@@ -55,6 +45,7 @@ int solve(Graph* graph, unsigned int* capitals, unsigned int len, char* outputfi
         }
         insertHeap(allHeap[i], capitals[i], 0);
     }
+
     unsigned int cntSkip = 0;
     while (cntVisited < n && cntSkip != len) {
         cntSkip = 0;
@@ -65,32 +56,33 @@ int solve(Graph* graph, unsigned int* capitals, unsigned int len, char* outputfi
                 extractMinHeap(allHeap[i]);
                 unsigned int city = node.city;
                 unsigned int cityIdx = city - 1;
-                
+
                 if (visited[cityIdx] == 0) {
                     found = 1;
                     visited[cityIdx] = i + 1;
                     cntVisited++;
-                    
+
                     for (unsigned int j = 0; j < graph->vertex[cityIdx]->cntNeighbors; j++) {
                         unsigned int vertex = graph->vertex[cityIdx]->neighbors[j];
                         int weight = graph->vertex[cityIdx]->weightNeighbors[j];
-                        
+
                         if (!visited[vertex - 1]) {
                             insertHeap(allHeap[i], vertex, weight);
                         }
                     }
                 }
             }
-            
+
             if (!found) {
                 cntSkip++;
             }
         }
     }
-    
+
     for (unsigned int i = 0; i < len; i++) {
         deleteHeap(allHeap[i]);
     }
+
     FILE* file = fopen(outputfile, "w");
     if (file == NULL) {
         free(allHeap);
@@ -106,6 +98,7 @@ int solve(Graph* graph, unsigned int* capitals, unsigned int len, char* outputfi
         }
         fprintf(file, "\n");
     }
+
     free(allHeap);
     free(visited);
     fclose(file);
@@ -114,15 +107,14 @@ int solve(Graph* graph, unsigned int* capitals, unsigned int len, char* outputfi
 
 int main(int argc, char* argv[])
 {
-
     if (argc != 3) {
         return -1;
-    }    
+    }
     unsigned int* capitals = NULL;
     unsigned int len = 0;
 
     Graph* graph = readfile(&capitals, &len, argv[1]);
-    
+
     if (graph == NULL) {
         printf("Error reading file\n");
         return 1;
@@ -136,6 +128,6 @@ int main(int argc, char* argv[])
     }
     deleteGraph(graph);
     free(capitals);
-    
+
     return result;
 }
