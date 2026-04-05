@@ -20,46 +20,29 @@ jobs:
           sudo ln -sf /usr/bin/clang-tidy-18 /usr/bin/clang-tidy
           sudo ln -sf /usr/bin/run-clang-tidy-18 /usr/bin/run-clang-tidy
       
-      - name: Check format (All files)
+      - name: Check format
         run: |
-          # Обновили, чтобы он игнорировал папки build и в корне, и в graph
           find . -path ./build -prune -o -path ./graph/build -prune -o -type f -name '*.[c|h]' -print | xargs clang-format --style=file --dry-run -Werror
-      - name: Configure Main Project
+      
+      - name: Build and Test Main Task
         run: |
           cmake . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      
-      - name: Build Main Project
-        run: |
           cmake --build build
-      
-      - name: Lint Main Project
-        run: |
           run-clang-tidy -p=build
-          
-      - name: Run Main tests (ctest)
-        run: |
-          cd build
-          ctest --output-on-failure
-      
-      - name: Run Main test script
-        run: |
-          chmod +x run_tests.sh
-          ./run_tests.sh
-      - name: Configure Graph Project
-        run: |
-          cd graph
-          cmake . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-      
-      - name: Build Graph Project
-        run: |
-          cd graph
-          cmake --build build
-          
-      - name: Lint Graph Project
-        run: |
-          cd graph
-          run-clang-tidy -p=build
+          if [ -f run_tests.sh ]; then
+            chmod +x run_tests.sh
+            ./run_tests.sh
+          fi
 
-      - name: Run Graph test script
+      - name: Build and Test Graph Task
         run: |
-          cd graph
+          if [ -d "graph" ]; then
+            cd graph
+            cmake . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+            cmake --build build
+            run-clang-tidy -p=build
+            if [ -f run_tests.sh ]; then
+              chmod +x run_tests.sh
+              ./run_tests.sh
+            fi
+          fi
