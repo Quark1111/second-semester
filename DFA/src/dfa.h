@@ -22,8 +22,6 @@ typedef struct {
     unsigned int start;
 } Dfa;
 
-Dfa* createDfa(Transition* transition, unsigned int* accepting,
-               unsigned int countTransition, unsigned int countAccepting,
-               unsigned int start);
+Dfa* createDfa(Transition* transition, unsigned int* accepting, unsigned int countTransition, unsigned int countAccepting, unsigned int start);
 void deleteDfa(Dfa* dfa);
 Result runDfa(Dfa* dfa, char* str);
