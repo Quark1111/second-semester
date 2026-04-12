@@ -8,25 +8,25 @@ int main()
     Transition transition[100];
     unsigned int index = 0;
 
-    transition[index++] = (Transition){0, '-', '-', 8};
-    transition[index++] = (Transition){0, '.', '.', 2};
-    transition[index++] = (Transition){0, '0', '9', 1};
-    transition[index++] = (Transition){8, '0', '9', 1};
-    transition[index++] = (Transition){8, '.', '.', 2};
-    transition[index++] = (Transition){1, '0', '9', 1};
-    transition[index++] = (Transition){1, '.', '.', 2};
-    transition[index++] = (Transition){1, 'E', 'E', 4};
-    transition[index++] = (Transition){2, '0', '9', 3};
-    transition[index++] = (Transition){3, '0', '9', 3};
-    transition[index++] = (Transition){3, 'E', 'E', 4};
-    transition[index++] = (Transition){4, '0', '9', 6};
-    transition[index++] = (Transition){4, '+', '+', 5};
-    transition[index++] = (Transition){4, '-', '-', 5};
-    transition[index++] = (Transition){5, '0', '9', 6};
-    transition[index++] = (Transition){6, '0', '9', 6};
+    transition[index++] = (Transition){ 0, '-', '-', 8 };
+    transition[index++] = (Transition){ 0, '.', '.', 2 };
+    transition[index++] = (Transition){ 0, '0', '9', 1 };
+    transition[index++] = (Transition){ 8, '0', '9', 1 };
+    transition[index++] = (Transition){ 8, '.', '.', 2 };
+    transition[index++] = (Transition){ 1, '0', '9', 1 };
+    transition[index++] = (Transition){ 1, '.', '.', 2 };
+    transition[index++] = (Transition){ 1, 'E', 'E', 4 };
+    transition[index++] = (Transition){ 2, '0', '9', 3 };
+    transition[index++] = (Transition){ 3, '0', '9', 3 };
+    transition[index++] = (Transition){ 3, 'E', 'E', 4 };
+    transition[index++] = (Transition){ 4, '0', '9', 6 };
+    transition[index++] = (Transition){ 4, '+', '+', 5 };
+    transition[index++] = (Transition){ 4, '-', '-', 5 };
+    transition[index++] = (Transition){ 5, '0', '9', 6 };
+    transition[index++] = (Transition){ 6, '0', '9', 6 };
 
     unsigned int countTransition = index;
-    unsigned int accepting[] = {1, 3, 6};
+    unsigned int accepting[] = { 1, 3, 6 };
     unsigned int countAccepting = 3;
     unsigned int start = 0;
 
