@@ -30,8 +30,7 @@ int main()
     unsigned int countAccepting = 3;
     unsigned int start = 0;
 
-    Dfa* dfa = createDfa(transition, accepting, countTransition,
-        countAccepting, start);
+    Dfa* dfa = createDfa(transition, accepting, countTransition, countAccepting, start);
     if (dfa == NULL) {
         printf("Ошибка: не удалось создать автомат\n");
         return 1;
