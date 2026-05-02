@@ -183,7 +183,6 @@ static Table* readCSV(const char* inputfile)
         printf("File not found: %s\n", inputfile);
         return NULL;
     }
-    
     Table* table = calloc(1, sizeof(Table));
     if (table == NULL) {
         fclose(file);
