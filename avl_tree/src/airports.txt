@@ -670,7 +670,7 @@ BFV:Buri Ram Airport
 BFW:Sidi Bel Abbes Airport
 BFX:Bafoussam Airport
 BFY:Bengbu Tenghu Airport
-BGA:Palonegro Airport
+BGA:Palongro Airport
 BGB:Booue Airport
 BGC:Bragança Airport
 BGD:Hutchinson County Airport
