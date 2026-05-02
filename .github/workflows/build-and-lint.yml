@@ -19,10 +19,14 @@ jobs:
       run: |
         find . -path ./build -prune -o -name '*.[ch]' -print | xargs clang-format --style=WebKit --dry-run --Werror
 
-    - name: Static Analysis (Manual Mode)
+    - name: Static Analysis
       run: |
-        find . -name "*.c" -not -path "./build/*" | xargs clang-tidy --checks='-*,bugprone-*,cert-*,clang-analyzer-*,readability-*' -- -IDFA/src -Isrc
-
+        FILES=$(find . -name "*.c" -not -path "./build/*")
+        if [ -z "$FILES" ]; then
+          echo "Файлы .c не найдены, пропускаю анализ."
+        else
+          echo "$FILES" | xargs clang-tidy --checks='-*,bugprone-*,cert-*,clang-analyzer-*,readability-*' -- -IDFA/src -Isrc
+        fi
     - name: Build and Test
       run: |
         cmake -S . -B build
