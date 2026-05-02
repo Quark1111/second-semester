@@ -1,0 +1,5 @@
+Short,Medium,Long,Special
+Hi,Hello,This is a very long text that might exceed typical column width,Hello World!
+A,B,C,D
+X,Y,Z,!
+Test,"Quoted text",'Single quotes',@#$%
