@@ -21,10 +21,10 @@ typedef enum {
 typedef struct Dfa Dfa;
 
 // Создаёт детерминированный конечный автомат.
-Dfa* createDfa(Transition* transition, unsigned int* accepting, 
-               unsigned int countTransition, unsigned int countAccepting, 
-               unsigned int start);
-               
+Dfa* createDfa(Transition* transition, unsigned int* accepting,
+    unsigned int countTransition, unsigned int countAccepting,
+    unsigned int start);
+
 // Проверяет, принадлежит ли строка языку автомата.
 Result runDfa(const Dfa* dfa, const char* str);
 
