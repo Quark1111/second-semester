@@ -2,7 +2,7 @@ name: Build and Lint
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, avl_tree ]
   pull_request:
     branches: [ main, master ]
 
@@ -27,4 +27,4 @@ jobs:
 
       - name: tests
         run: |
-          ./run_tests.sh
+          ./build/test_avl_tree
