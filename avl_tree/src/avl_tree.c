@@ -40,8 +40,8 @@ char* find(const AvlTree* tree, const char* key)
 
 static void split(char* str, char** key, char** fullName)
 {
-    int length = strlen(str);
-    for (int i = 0; i < length; i++) {
+    size_t length = strlen(str);
+    for (size_t i = 0; i < length; i++) {
         if (str[i] == ':') {
             *key = malloc((i + 1) * sizeof(char));
             *fullName = malloc((length - i) * sizeof(char));
@@ -136,6 +136,9 @@ static Node* bigRotateRight(Node* node)
 
 static Node* balanceNode(Node* node)
 {
+    if (node == NULL) {
+        return NULL;
+    }
     int balance = getHeight(node->left) - getHeight(node->right);
     if (balance == 2) {
         if (getHeight(node->left->left) - getHeight(node->left->right) >= 0) {
@@ -236,8 +239,10 @@ static Node* deleteNode(Node* node, const char* key, bool* unique)
         while (newNode->left != NULL) {
             newNode = newNode->left;
         }
-        char* newKey = malloc(strlen(newNode->key) + 1);
-        char* newFullName = malloc(strlen(newNode->fullName) + 1);
+        size_t keyLength = strlen(newNode->key) + 1;
+        size_t nameLength = strlen(newNode->fullName) + 1;
+        char* newKey = malloc(keyLength);
+        char* newFullName = malloc(nameLength);
         if (newKey == NULL || newFullName == NULL) {
             free(newKey);
             free(newFullName);
@@ -247,8 +252,8 @@ static Node* deleteNode(Node* node, const char* key, bool* unique)
         free(node->fullName);
         node->key = newKey;
         node->fullName = newFullName;
-        strcpy(node->key, newNode->key);
-        strcpy(node->fullName, newNode->fullName);
+        memcpy(node->key, newNode->key, keyLength);
+        memcpy(node->fullName, newNode->fullName, nameLength);
         node->right = deleteNode(node->right, node->key, unique);
     }
     updateNode(node);
