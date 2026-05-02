@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void readFile(AvlTree* tree, char* inputfile)
+static void readFile(AvlTree* tree, char* inputfile)
 {
     FILE* file = fopen(inputfile, "r");
     if (file == NULL) {
@@ -14,7 +14,7 @@ void readFile(AvlTree* tree, char* inputfile)
     char* buffer = NULL;
     size_t len = 0;
     int read;
-    
+
     while ((read = getline(&buffer, &len, file)) != -1) {
         if (read > 0 && buffer[read - 1] == '\n') {
             buffer[read - 1] = '\0';
@@ -25,50 +25,49 @@ void readFile(AvlTree* tree, char* inputfile)
     fclose(file);
 }
 
-void interface(AvlTree* tree, int argc, char* outputfile)
+static void runInterface(AvlTree* tree, int argc, char* outputfile)
 {
     char* buffer = NULL;
     size_t len = 0;
-    int read;
-    
-    while (1) {
+
+    while (true) {
         printf("> ");
-        read = getline(&buffer, &len, stdin);
+        int read = getline(&buffer, &len, stdin);
         if (read == -1) {
-            quit(tree);
+            deleteTree(tree);
             free(buffer);
             break;
         }
-        
+
         if (read > 0 && buffer[read - 1] == '\n') {
             buffer[read - 1] = '\0';
         }
-        
+
         if (strncmp(buffer, "find ", 5) == 0) {
             char* code = buffer + 5;
-            char* result = find(tree->root, code);
+            char* result = find(tree, code);
             if (result) {
                 printf("%s -> %s\n", code, result);
             } else {
                 printf("Аэропорт с кодом '%s' не найден в базе.\n", code);
             }
-        }
-        else if (strncmp(buffer, "add ", 4) == 0) {
+        } else if (strncmp(buffer, "add ", 4) == 0) {
             char* str = buffer + 4;
-            insert(tree, str);
-            printf("Аэропорт добавлен в базу.\n");
-        }
-        else if (strncmp(buffer, "delete ", 7) == 0) {
+            if (insert(tree, str) == 0) {
+                printf("Аэропорт добавлен в базу.\n");
+            } else {
+                printf("Ошибка при добавлении.\n");
+            }
+        } else if (strncmp(buffer, "delete ", 7) == 0) {
             char* code = buffer + 7;
-            int old_size = tree->size;
+            int oldSize = getSize(tree);
             delete(tree, code);
-            if (tree->size < old_size) {
+            if (getSize(tree) < oldSize) {
                 printf("Аэропорт '%s' удалён из базы.\n", code);
             } else {
                 printf("Аэропорт с кодом '%s' не найден.\n", code);
             }
-        }
-        else if (strcmp(buffer, "save") == 0) {
+        } else if (strcmp(buffer, "save") == 0) {
             if (argc == 1) {
                 char namefile[100];
                 printf("Введите имя файла: ");
@@ -80,18 +79,16 @@ void interface(AvlTree* tree, int argc, char* outputfile)
                 while ((c = getchar()) != '\n' && c != EOF);
             } else {
                 save(tree, outputfile);
-                printf("База сохранена: %d аэропортов.\n", tree->size);
+                printf("База сохранена: %d аэропортов.\n", getSize(tree));
             }
-        }
-        else if (strcmp(buffer, "quit") == 0) {
-            quit(tree);
+        } else if (strcmp(buffer, "quit") == 0) {
+            deleteTree(tree);
             free(buffer);
             return;
-        }
-        else if (strlen(buffer) > 0) {
+        } else if (strlen(buffer) > 0) {
             printf("Неизвестная команда\n");
         }
-        
+
         free(buffer);
         buffer = NULL;
     }
@@ -100,14 +97,14 @@ void interface(AvlTree* tree, int argc, char* outputfile)
 int main(int argc, char* argv[])
 {
     AvlTree* tree = createTree();
-    
+
     if (argc == 2) {
         readFile(tree, argv[1]);
-        printf("Загружено %d аэропортов. Система готова к работе.\n", tree->size);
-        interface(tree, argc, argv[1]);
+        printf("Загружено %d аэропортов. Система готова к работе.\n", getSize(tree));
+        runInterface(tree, argc, argv[1]);
     } else if (argc == 1) {
         printf("Система готова к работе. База пуста.\n");
-        interface(tree, argc, NULL);
+        runInterface(tree, argc, NULL);
     }
     return 0;
 }
