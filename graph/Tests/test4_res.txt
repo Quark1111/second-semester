@@ -1,0 +1,4 @@
+State number 1 has cities: 1 3 6 11 
+State number 2 has cities: 2 4 5 
+State number 3 has cities: 8 9 10 14 
+State number 4 has cities: 7 12 13 15 
