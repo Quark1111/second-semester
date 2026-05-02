@@ -1,6 +1,6 @@
 #include "dfa.h"
-#include <stdio.h>
 #include <assert.h>
+#include <stdio.h>
 
 void testCreateDfaNull()
 {
