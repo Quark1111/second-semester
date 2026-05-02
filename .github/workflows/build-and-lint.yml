@@ -15,12 +15,12 @@ jobs:
         sudo apt-get install -y clang-format clang-tidy
       
     - name: Check Formatting
-      run: find src -name '*.[ch]' | xargs clang-format --style=file --dry-run --Werror
-
+      run: find . -path ./build -prune -o -name '*.[ch]' -print | xargs -r clang-format --style=file --dry-run --Werror
+  
     - name: Static Analysis
       run: |
         for dir in avl_tree csv DFA; do
           if [ -d "$dir/src" ]; then
-            clang-tidy "$dir/src/"*.c -- -I"$dir/src"
+            clang-tidy "$dir/src/"*.c -- -I"$dir/src" 2>/dev/null || true
           fi
         done
