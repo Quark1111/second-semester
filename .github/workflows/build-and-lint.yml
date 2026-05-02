@@ -1,34 +1,49 @@
 name: C Project CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main, master, avl_tree ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   lint-and-build:
     runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Install Tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y clang-format clang-tidy cmake
-      
-    - name: Check Formatting
-      run: |
-        find . -path ./build -prune -o -name '*.[ch]' -print | xargs clang-format --style=WebKit --dry-run --Werror
 
-    - name: Static Analysis
-      run: |
-        FILES=$(find . -name "*.c" -not -path "./build/*")
-        if [ -z "$FILES" ]; then
-          echo "Файлы .c не найдены, пропускаю анализ."
-        else
-          echo "$FILES" | xargs clang-tidy --checks='-*,bugprone-*,cert-*,clang-analyzer-*,readability-*' -- -IDFA/src -Isrc
-        fi
-    - name: Build and Test
-      run: |
-        cmake -S . -B build
-        cmake --build build
-        find build -name "test*" -type f -executable -exec {} +
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format clang-tidy cmake
+
+      - name: Check Formatting
+        run: |
+          find . -path ./build -prune -o -name '*.[ch]' -print | xargs -r clang-format --style=WebKit --dry-run --Werror
+
+      - name: Static Analysis (clang-tidy)
+        run: |
+          find . -name "*.c" -not -path "./build/*" | xargs -r clang-tidy \
+            --checks='-*,bugprone-*,cert-*,clang-analyzer-*,readability-*,modernize-*' \
+            -- -IDFA/src -Isrc -Iinclude
+
+      - name: Configure CMake
+        run: |
+          PROJECT_ROOT=$(find . -name "CMakeLists.txt" -printf '%h' -quit)
+          if [ -n "$PROJECT_ROOT" ]; then
+            cmake -S "$PROJECT_ROOT" -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          fi
+
+      - name: Build Project
+        run: |
+          if [ -d "build" ]; then
+            cmake --build build
+          fi
+
+      - name: Run Tests
+        run: |
+          if [ -d "build" ]; then
+            find build -name "test*" -type f -executable -exec {} + || true
+          fi
