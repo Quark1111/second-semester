@@ -11,8 +11,8 @@ struct Dfa {
 };
 
 Dfa* createDfa(Transition* transition, unsigned int* accepting,
-               unsigned int countTransition, unsigned int countAccepting,
-               unsigned int start)
+    unsigned int countTransition, unsigned int countAccepting,
+    unsigned int start)
 {
     if (transition == NULL || accepting == NULL) {
         return NULL;
