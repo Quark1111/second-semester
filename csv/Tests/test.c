@@ -8,7 +8,6 @@ static int compareFiles(const char* file1, const char* file2)
     if (first == NULL) {
         return 0;
     }
-
     FILE* second = fopen(file2, "r");
     if (second == NULL) {
         fclose(first);
