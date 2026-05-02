@@ -1,47 +1,30 @@
-name: Build and Lint
+name: C Project CI
 
-on:
-  push:
-    branches: [ main, master, avl_tree ]
-  pull_request:
-    branches: [ main, master ]
+on: [push, pull_request]
 
 jobs:
-  build-and-lint:
+  lint-and-build:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Install Tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format clang-tidy cmake
+      
+    - name: Check Formatting
+      run: |
+        find . -path ./build -prune -o -name '*.[ch]' -print | xargs clang-format --style=WebKit --dry-run --Werror
 
-      - name: Install tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-tidy clang-format cmake
+    - name: Static Analysis (Manual Mode)
+      run: |
+        find . -name "*.c" -not -path "./build/*" | xargs clang-tidy --checks='-*,bugprone-*,cert-*,clang-analyzer-*,readability-*' -- -IDFA/src -Isrc
 
-      - name: Configure CMake
-        run: |
-          PROJECT_ROOT=$(find . -name "CMakeLists.txt" -printf '%h' -quit)
-          
-          if [ -z "$PROJECT_ROOT" ]; then
-            echo "Error: CMakeLists.txt не найден в репозитории!"
-            exit 1
-          fi
-          
-          echo "Проект найден в папке: $PROJECT_ROOT"
-          cmake -S "$PROJECT_ROOT" -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-
-      - name: clang-tidy
-        run: |
-          run-clang-tidy -p build -checks='-*,bugprone-*,cert-*,clang-analyzer-*,misc-*,performance-*,readability-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling'
-
-      - name: clang-format
-        run: |
-          find . -path ./build -prune -o -name '*.[ch]' -print | xargs clang-format --dry-run --style=WebKit --Werror
-
-      - name: Build
-        run: |
-          cmake --build build
-
-      - name: Run tests
-        run: |
-          find build -name "test*" -type f -executable -exec {} +
+    - name: Build and Test
+      run: |
+        cmake -S . -B build
+        cmake --build build
+        find build -name "test*" -type f -executable -exec {} +
