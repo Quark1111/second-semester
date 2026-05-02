@@ -1,11 +1,6 @@
-typedef enum {
-    reject,
-    accept,
-    unknownSYMBOL,
-    noTRANSITION,
-    nullpointerexception,
-    emptyDfa
-} Result;
+#pragma once
+
+#include <stdbool.h>
 
 typedef struct {
     unsigned int from;
@@ -14,14 +9,24 @@ typedef struct {
     unsigned int to;
 } Transition;
 
-typedef struct {
-    Transition* transition;
-    unsigned int countTransition;
-    unsigned int countAccepting;
-    unsigned int* accepting;
-    unsigned int start;
-} Dfa;
+typedef enum {
+    accept,
+    reject,
+    unknownSymbol,
+    noTransition,
+    nullPointerError,
+    emptyDfa
+} Result;
 
-Dfa* createDfa(Transition* transition, unsigned int* accepting, unsigned int countTransition, unsigned int countAccepting, unsigned int start);
+typedef struct Dfa Dfa;
+
+// Создаёт детерминированный конечный автомат.
+Dfa* createDfa(Transition* transition, unsigned int* accepting, 
+               unsigned int countTransition, unsigned int countAccepting, 
+               unsigned int start);
+               
+// Проверяет, принадлежит ли строка языку автомата.
+Result runDfa(const Dfa* dfa, const char* str);
+
+// Удаляет автомат и освобождает память.
 void deleteDfa(Dfa* dfa);
-Result runDfa(Dfa* dfa, char* str);

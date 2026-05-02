@@ -1,8 +1,18 @@
-#include <stdbool.h>
+#include "dfa.h"
 #include <stdlib.h>
 #include <string.h>
 
-Dfa* createDfa(Transition* transition, unsigned int* accepting, unsigned int countTransition, unsigned int countAccepting, unsigned int start)
+struct Dfa {
+    Transition* transition;
+    unsigned int countTransition;
+    unsigned int* accepting;
+    unsigned int countAccepting;
+    unsigned int start;
+};
+
+Dfa* createDfa(Transition* transition, unsigned int* accepting,
+               unsigned int countTransition, unsigned int countAccepting,
+               unsigned int start)
 {
     if (transition == NULL || accepting == NULL) {
         return NULL;
@@ -37,65 +47,62 @@ Dfa* createDfa(Transition* transition, unsigned int* accepting, unsigned int cou
     return dfa;
 }
 
-static bool isAlphabet(Transition transition, char symbol)
+static bool isSymbolInRange(Transition transition, char symbol)
 {
     return transition.fromSymbol <= symbol && symbol <= transition.toSymbol;
 }
 
-static Result move(Dfa* dfa, unsigned int* state, char symbol)
+static Result move(const Dfa* dfa, unsigned int* state, char symbol)
 {
-    bool unknown = 1;
+    bool unknown = true;
 
     for (unsigned int i = 0; i < dfa->countTransition; i++) {
         if (dfa->transition[i].from == *state
-            && isAlphabet(dfa->transition[i], symbol)) {
+            && isSymbolInRange(dfa->transition[i], symbol)) {
             *state = dfa->transition[i].to;
             return accept;
         }
-        if (isAlphabet(dfa->transition[i], symbol)) {
-            unknown = 0;
+        if (isSymbolInRange(dfa->transition[i], symbol)) {
+            unknown = false;
         }
     }
 
-    if (unknown) {
-        return unknownSYMBOL;
-    }
-    return noTRANSITION;
+    return unknown ? unknownSymbol : noTransition;
 }
 
-Result runDfa(Dfa* dfa, char* str)
+Result runDfa(const Dfa* dfa, const char* str)
 {
     if (dfa == NULL || dfa->accepting == NULL || dfa->transition == NULL) {
-        return nullpointerexception;
+        return nullPointerError;
     }
     if (dfa->countAccepting == 0 || dfa->countTransition == 0) {
         return emptyDfa;
     }
 
     unsigned int state = dfa->start;
-    size_t len = strlen(str);
+    size_t length = strlen(str);
 
-    for (size_t i = 0; i < len; i++) {
-        Result flag = move(dfa, &state, str[i]);
-        if (flag != accept) {
-            return flag;
+    for (size_t i = 0; i < length; i++) {
+        Result result = move(dfa, &state, str[i]);
+        if (result != accept) {
+            return result;
         }
     }
 
-    for (size_t i = 0; i < dfa->countAccepting; i++) {
+    for (unsigned int i = 0; i < dfa->countAccepting; i++) {
         if (dfa->accepting[i] == state) {
             return accept;
         }
     }
+
     return reject;
 }
 
 void deleteDfa(Dfa* dfa)
 {
-    if (dfa == NULL) {
-        return;
+    if (dfa != NULL) {
+        free(dfa->accepting);
+        free(dfa->transition);
+        free(dfa);
     }
-    free(dfa->transition);
-    free(dfa->accepting);
-    free(dfa);
 }

@@ -3,12 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main()
-{
+int main(int argc, char* argv[]) {
     Transition transition[100];
     unsigned int index = 0;
 
     transition[index++] = (Transition) { 0, '-', '-', 8 };
+    transition[index++] = (Transition) { 0, '+', '+', 8 };
     transition[index++] = (Transition) { 0, '.', '.', 2 };
     transition[index++] = (Transition) { 0, '0', '9', 1 };
     transition[index++] = (Transition) { 8, '0', '9', 1 };
@@ -60,10 +60,10 @@ int main()
     case reject:
         printf("Это не число :(\n");
         break;
-    case unknownSYMBOL:
+    case unknownSymbol:
         printf("Это не число :( (неизвестный символ)\n");
         break;
-    case noTRANSITION:
+    case noTransition:
         printf("Это не число :( (недопустимая последовательность)\n");
         break;
     default:
