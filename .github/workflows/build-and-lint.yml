@@ -16,9 +16,11 @@ jobs:
       
     - name: Check Formatting
       run: find . -path ./build -prune -o -name '*.[ch]' -print | xargs -r clang-format --style=file --dry-run --Werror
-
+    
     - name: Static Analysis
       run: |
-        clang-tidy csv/src/*.c -- -Icsv/src
-        clang-tidy avl_tree/src/*.c -- -Iavl_tree/src
-        clang-tidy DFA/src/*.c -- -IDFA/src
+        for dir in avl_tree csv DFA; do
+          if [ -d "$dir/src" ]; then
+            clang-tidy "$dir/src/"*.c -- -I"$dir/src"
+          fi
+        done
