@@ -2,12 +2,14 @@
 #include <stdio.h>
 #include <assert.h>
 
-void testCreateDfaNull() {
+void testCreateDfaNull()
+{
     assert(createDfa(NULL, NULL, 0, 0, 0) == NULL);
     printf("OK\n");
 }
 
-void testCreateDfaValid() {
+void testCreateDfaValid()
+{
     Transition transition[] = { { 0, 'a', 'a', 1 } };
     unsigned int accepting[] = { 1 };
     Dfa* dfa = createDfa(transition, accepting, 1, 1, 0);
@@ -18,7 +20,8 @@ void testCreateDfaValid() {
     printf("OK\n");
 }
 
-void testSimpleNumber() {
+void testSimpleNumber()
+{
     Transition transition[] = {
         { 0, '0', '9', 1 },
         { 1, '0', '9', 1 }
@@ -30,7 +33,8 @@ void testSimpleNumber() {
     printf("OK\n");
 }
 
-void testFloatNumber() {
+void testFloatNumber()
+{
     Transition transition[] = {
         { 0, '0', '9', 1 },
         { 1, '0', '9', 1 },
@@ -45,7 +49,8 @@ void testFloatNumber() {
     printf("OK\n");
 }
 
-void testScientificNotation() {
+void testScientificNotation()
+{
     Transition transition[] = {
         { 0, '0', '9', 1 },
         { 1, '0', '9', 1 },
@@ -60,7 +65,8 @@ void testScientificNotation() {
     printf("OK\n");
 }
 
-void testInvalidCharacter() {
+void testInvalidCharacter()
+{
     Transition transition[] = {
         { 0, '0', '9', 1 },
         { 1, '0', '9', 1 }
@@ -72,7 +78,8 @@ void testInvalidCharacter() {
     printf("OK\n");
 }
 
-void testIncompleteNumber() {
+void testIncompleteNumber()
+{
     Transition transition[] = {
         { 0, '0', '9', 1 },
         { 1, '0', '9', 1 },
@@ -87,7 +94,8 @@ void testIncompleteNumber() {
     printf("OK\n");
 }
 
-void testEmptyString() {
+void testEmptyString()
+{
     Transition transition[] = {
         { 0, '0', '9', 1 },
         { 1, '0', '9', 1 }
@@ -99,12 +107,14 @@ void testEmptyString() {
     printf("OK\n");
 }
 
-void testNullDfa() {
+void testNullDfa()
+{
     assert(runDfa(NULL, "test") == nullPointerError);
     printf("OK\n");
 }
 
-int main() {
+int main()
+{
     printf("Запуск тестов ДКА:\n");
     testCreateDfaNull();
     testCreateDfaValid();
