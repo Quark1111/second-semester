@@ -9,7 +9,7 @@ AAI:Arraias Airport
 AAJ:Cayana Airstrip
 AAK:Aranuka Airport
 AAL:Aalborg Airport
-AAM:Malamala Airport
+AAM:Malamala Aiport
 AAN:Al Ain International Airport
 AAO:Anaco Airport
 AAP:Aji Pangeran Tumenggung Pranoto International Airport
