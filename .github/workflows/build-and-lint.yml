@@ -19,4 +19,6 @@ jobs:
 
     - name: Static Analysis
       run: |
-        find . -path ./build -prune -o -name "*.c" -print | xargs -r clang-tidy -p=build
+        clang-tidy csv/src/*.c -- -Icsv/src
+        clang-tidy avl_tree/src/*.c -- -Iavl_tree/src
+        clang-tidy DFA/src/*.c -- -IDFA/src
