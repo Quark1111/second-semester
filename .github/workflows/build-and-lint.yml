@@ -10,21 +10,26 @@ jobs:
   build-and-lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Build
+      - name: Install tools
         run: |
-          cmake -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          cmake --build build
+          sudo apt-get update
+          sudo apt-get install -y clang-tidy clang-format cmake
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: clang-tidy
         run: |
-          run-clang-tidy -p=build -checks=-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+          run-clang-tidy -p build -checks='-*,bugprone-*,cert-*,clang-analyzer-*,cppcoreguidelines-*,misc-*,modernize-*,performance-*,readability-*,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling'
 
       - name: clang-format
         run: |
-          find . -path ./build -prune -o -name '*.[c|h]' -print | xargs clang-format --dry-run --style=Webkit --Werror
+          find . -path ./build -prune -o -name '*.[c|h]' -print | xargs clang-format --dry-run --style=WebKit --Werror
 
-      - name: tests
+      - name: Build
         run: |
-          ./build/test_avl_tree
+          cmake --build build
